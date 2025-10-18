@@ -1,9 +1,5 @@
 # ĐỒ ÁN SES - THUẬT TOÁN SCHIPER-EGGLI-SANDOZ
 
-**Môn học:** Hệ thống phân tán (HTPT)  
-**Đề tài:** Cài đặt thuật toán SES để đảm bảo thứ tự nhân quả trong hệ thống phân tán  
-**Deadline:** 19-10-2025
-
 ---
 
 ## MỤC LỤC
@@ -60,9 +56,7 @@ python3 --version
 
 3. **Cấp quyền thực thi (Linux/Unix):**
 ```bash
-chmod +x src/ses_process.py
-chmod +x src/launch_all.py
-chmod +x src/log_analyzer.py
+make setup
 ```
 
 4. **Không cần cài đặt thêm dependencies** - dự án chỉ sử dụng thư viện chuẩn của Python!
@@ -96,33 +90,35 @@ HTPT_LAB01/
 ### Cách 1: Chạy tất cả 15 processes cùng lúc (Khuyến nghị)
 
 ```bash
-python3 src/launch_all.py [số_message] [messages_per_minute]
+make run
+# or
+make run-custom MSGS=[số_message] RATE=[messages_per_minute]
 ```
 
 **Ví dụ:**
 ```bash
 # Mặc định: 150 messages, 100 messages/phút
-python3 src/launch_all.py
+make run
 
 # Custom: 200 messages, 50 messages/phút
-python3 src/launch_all.py 200 50
+make run-custom MSGS=200 RATE=50
 ```
 
 ### Cách 2: Chạy từng process riêng lẻ
 
 **Terminal 1:**
 ```bash
-python3 src/ses_process.py 0 150 100
+make run-single PROC=0 MSGS=150 RATE=100
 ```
 
 **Terminal 2:**
 ```bash
-python3 src/ses_process.py 1 150 100
+make run-single PROC=1 MSGS=150 RATE=100
 ```
 
 **Terminal 3:**
 ```bash
-python3 src/ses_process.py 2 150 100
+make run-single PROC=2 MSGS=150 RATE=100
 ```
 
 ... và tiếp tục cho đến process 14.
@@ -131,12 +127,12 @@ python3 src/ses_process.py 2 150 100
 
 **Xem tổng quan tất cả processes:**
 ```bash
-python3 src/log_analyzer.py
+make analyze
 ```
 
 **Xem chi tiết một process cụ thể:**
 ```bash
-python3 src/log_analyzer.py 0
+make analyze-process PROC=0
 ```
 
 ### Tương tác trong khi chạy:
@@ -329,20 +325,5 @@ lsof -ti:5000 | xargs kill -9
 3. **Source code:**
    - Xem chi tiết trong thư mục `src/`
    - Comments đầy đủ trong code
-
----
-
-## THÔNG TIN LIÊN HỆ
-
-**Sinh viên thực hiện:** [Tên của bạn]  
-**MSSV:** [MSSV của bạn]  
-**Email:** [Email của bạn]  
-**Lớp:** [Lớp của bạn]
-
----
-
-## LICENSE
-
-Dự án này được tạo cho mục đích học tập trong môn Hệ thống phân tán.
 
 ---

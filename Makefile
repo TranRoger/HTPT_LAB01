@@ -12,7 +12,7 @@ setup:
 	chmod +x src/launch_all.py
 	chmod +x src/log_analyzer.py
 	chmod +x test.sh
-	@echo "✓ Setup complete!"
+	@echo "Setup complete!"
 
 # Run full demo with 15 processes
 run:
@@ -28,9 +28,9 @@ run-test:
 	@echo "Running quick test (10 messages per process)..."
 	python3 src/launch_all.py 10 200
 
-# Run single process: make run-single PROC=0
+# Run single process: make run-single PROC=0 MSGS=150 RATE=100
 run-single:
-	python3 src/ses_process.py $(PROC) 150 100
+	python3 src/ses_process.py $(PROC) ${MSGS} ${RATE}
 
 # Run all tests
 test:
