@@ -46,11 +46,16 @@ Thumbs.db
 *.tmp
 *.temp
 
-# docs
-docs/images
-docs/main*
-docs/*.tex
-docs/*.png
+# docs - LaTeX auxiliary files
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.toc
 docs/*.fls
+docs/*.synctex.gz
 docs/_minted
 docs/.latex*
+docs/*.tex
+docs/*.png
+docs/*.nlo
+docs/*latexmk
