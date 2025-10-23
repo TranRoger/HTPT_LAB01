@@ -280,8 +280,11 @@ class SESProcess:
         self.logger.info(f"  Updated VC:  {self.vector_clock}")
         self.logger.info(f"  Total from P{msg.sender_id}: {self.messages_delivered[msg.sender_id]}")
         
-        # Console output với màu
-        self._print_colored(f"✓ DELIVERED: {msg}", "green")
+        # Console output với màu (wrapped in try-except to prevent crashes)
+        try:
+            self._print_colored(f"✓ DELIVERED: {msg}", "green")
+        except:
+            pass  # Ignore print errors
     
     def buffer_message(self, msg: Message, reasons: List[str]) -> None:
         """Buffer message khi chưa thể deliver"""
@@ -390,18 +393,20 @@ class SESProcess:
             self.vector_clock.increment()
             msg_timestamp = self.vector_clock.get_clock()
         
-        # BƯỚC 2: Tạo message (không cần lock)
-        self.messages_sent[receiver_id] += 1
-        msg = Message(
-            sender_id=self.process_id,
-            receiver_id=receiver_id,
-            content=content,
-            timestamp=msg_timestamp,
-            seq_num=self.messages_sent[receiver_id]
-        )
-        
-        # BƯỚC 3: Gửi đến receiver (PER-RECEIVER LOCK - đảm bảo thứ tự network)
+        # BƯỚC 2 & 3: Tạo message và gửi (PER-RECEIVER LOCK - đảm bảo thứ tự)
+        # QUAN TRỌNG: messages_sent phải increment trong lock để tránh race condition!
         with self.send_locks[receiver_id]:
+            # Increment counter và tạo message
+            self.messages_sent[receiver_id] += 1
+            msg = Message(
+                sender_id=self.process_id,
+                receiver_id=receiver_id,
+                content=content,
+                timestamp=msg_timestamp,
+                seq_num=self.messages_sent[receiver_id]
+            )
+            
+            # Gửi đến receiver
             receiver_config = self.config['processes'][receiver_id]
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -438,12 +443,7 @@ class SESProcess:
                 break
             
             content = f"Message {i} from P{self.process_id} to P{receiver_id}"
-            success = self.send_message(receiver_id, content)
-            
-            if not success:
-                self.logger.warning(f"Failed to send message {i} to P{receiver_id}, retrying...")
-                time.sleep(1)
-                self.send_message(receiver_id, content)  # Retry once
+            self.send_message(receiver_id, content)
             
             # Random delay để tạo tính ngẫu nhiên
             sleep_time = random.uniform(delay * 0.7, delay * 1.3)
