@@ -9,8 +9,6 @@
 3. [Cấu trúc dự án](#cấu-trúc-dự-án)
 4. [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)
 5. [Thuật toán SES](#thuật-toán-ses)
-6. [Video Demo](#video-demo)
-7. [Kết quả thực nghiệm](#kết-quả-thực-nghiệm)
 
 ---
 
@@ -199,66 +197,6 @@ Process 1 nhận M2 với TS=[0,0,2]
      Reason: Waiting for message #1 from P2 (got #2)
      Buffer size: 1
 ```
-
----
-
-## VIDEO DEMO
-
-### Link video demo:
-**[Video Demo trên YouTube/Drive]** (Thêm link sau khi quay)
-
-### Nội dung video demo:
-
-1. **Phần 1: Giới thiệu (2 phút)**
-   - Giới thiệu đồ án và yêu cầu
-   - Giải thích thuật toán SES
-   - Cấu trúc dự án
-
-2. **Phần 2: Demo chạy chương trình (5 phút)**
-   - Khởi chạy 15 processes
-   - Quan sát buffering và delivery
-   - Giải thích vector clock
-   - Hiển thị dependencies
-
-3. **Phần 3: Phân tích log files (3 phút)**
-   - Mở và giải thích log file
-   - Chạy log analyzer
-   - Thống kê kết quả
-
-4. **Phần 4: Tính đúng đắn (2 phút)**
-   - Chứng minh thứ tự nhân quả được đảm bảo
-   - Kiểm tra số lượng messages
-   - Kết luận
-
----
-
-## KẾT QUẢ THỰC NGHIỆM
-
-### Cấu hình test:
-- 15 processes
-- 150 messages/process
-- 100 messages/phút
-- Tổng: 15 × 14 × 150 = 31,500 messages
-
-### Kết quả mong đợi:
-
-| Process | Sent | Received | Delivered | Buffered |
-|---------|------|----------|-----------|----------|
-| P0      | 2100 | 2100     | 2100      | ~10-50   |
-| P1      | 2100 | 2100     | 2100      | ~10-50   |
-| ...     | ...  | ...      | ...       | ...      |
-| P14     | 2100 | 2100     | 2100      | ~10-50   |
-
-**Tổng:** 31,500 messages gửi = 31,500 messages nhận = 31,500 messages delivered ✓
-
-### Quan sát buffering:
-- Messages thường được buffer khi:
-  - Process khởi động chậm hơn
-  - Network delay không đồng đều
-  - Messages đến không theo thứ tự
-  
-- Buffer size thường: 0-50 messages
-- Max buffer size: ~100 messages (trong điều kiện tệ)
 
 ---
 

@@ -166,22 +166,22 @@ class SESProcess:
         """
         Check if message can be delivered according to SES algorithm
         Message M(i,j) can be delivered at process j if:
-        1. TS(M)[i] = VC[j][i] + 1
-        2. For all k != i: TS(M)[k] <= VC[j][k]
+        1. seq_num = delivered_count[i] + 1 (next in FIFO order from sender i)
+        2. For all k: TS(M)[k] <= VC[j][k] (no missing causally dependent messages)
         """
         current_vc = self.vector_clock.get_clock()
         msg_ts = msg.timestamp
         sender = msg.sender_id
         
-        # Condition 1: Message is the next expected from sender
-        if msg_ts[sender] != current_vc[sender] + 1:
+        # Condition 1: FIFO ordering - must be next expected message from this sender
+        expected_seq = self.messages_delivered[sender] + 1
+        if msg.seq_num != expected_seq:
             return False
         
-        # Condition 2: All other processes' timestamps are not ahead
+        # Condition 2: Causal dependencies - all timestamps must be satisfied
         for k in range(self.num_processes):
-            if k != sender:
-                if msg_ts[k] > current_vc[k]:
-                    return False
+            if msg_ts[k] > current_vc[k]:
+                return False
         
         return True
     
@@ -189,8 +189,9 @@ class SESProcess:
         """
         Deliver a message and update vector clock
         """
-        # Update vector clock
+        # Update vector clock: merge with message timestamp
         self.vector_clock.update(msg.timestamp)
+        # Increment the sender's entry in our vector clock (we've now seen one more message from sender)
         self.vector_clock.clock[msg.sender_id] += 1
         
         # Add to delivered messages
@@ -219,7 +220,7 @@ class SESProcess:
                     if self.can_deliver(msg):
                         self.buffer.remove(msg)
                         self.logger.info(f"⚡ UNBUFFERED: {msg.content} from P{msg.sender_id}")
-                        self.logger.info(f"  Reason: Dependencies satisfied")
+                        self.logger.info("  Reason: Dependencies satisfied")
                         self.deliver_message(msg)
                         delivered_any = True
                         break
@@ -245,7 +246,7 @@ class SESProcess:
                 self.max_buffer_size = max(self.max_buffer_size, len(self.buffer))
             
             self.logger.warning(f"⊕ BUFFERED: {msg.content} from P{msg.sender_id}")
-            self.logger.warning(f"  Reason: Waiting for dependencies")
+            self.logger.warning("  Reason: Waiting for dependencies")
             self.logger.warning(f"  Buffer size: {len(self.buffer)}")
             self._print_buffer_reason(msg)
             self._print_status(f"⊕ BUFFERED: {msg.content} (Buffer: {len(self.buffer)})", "yellow")
@@ -261,18 +262,17 @@ class SESProcess:
         
         reasons = []
         
-        # Check condition 1
-        if msg_ts[sender] != current_vc[sender] + 1:
-            expected = current_vc[sender] + 1
-            got = msg_ts[sender]
-            reason = f"Waiting for message #{expected} from P{sender} (got #{got})"
+        # Check FIFO condition
+        expected_seq = self.messages_delivered[sender] + 1
+        if msg.seq_num != expected_seq:
+            reason = f"Out of order: expecting seq #{expected_seq}, got #{msg.seq_num}"
             reasons.append(reason)
             self.logger.warning(f"  └─ {reason}")
         
-        # Check condition 2
+        # Check causal dependencies
         for k in range(self.num_processes):
-            if k != sender and msg_ts[k] > current_vc[k]:
-                reason = f"Waiting for P{k} to advance from {current_vc[k]} to {msg_ts[k]}"
+            if msg_ts[k] > current_vc[k]:
+                reason = f"Causal dep: need VC[{k}]>={msg_ts[k]}, have {current_vc[k]}"
                 reasons.append(reason)
                 self.logger.warning(f"  └─ {reason}")
     
@@ -302,7 +302,7 @@ class SESProcess:
         while self.running:
             try:
                 self.server_socket.settimeout(1.0)
-                client_socket, addr = self.server_socket.accept()
+                client_socket, _ = self.server_socket.accept()
                 thread = threading.Thread(target=self.handle_client, args=(client_socket,))
                 thread.daemon = True
                 thread.start()
@@ -311,6 +311,45 @@ class SESProcess:
             except Exception as e:
                 if self.running:
                     self.logger.error(f"Server error: {e}")
+
+    def wait_for_all_peers(self, timeout: float = 60.0, check_interval: float = 0.5):
+        """
+        Wait until all peer servers are accepting connections.
+        This performs a simple TCP connect check to each peer address:port.
+        If timeout is reached, it will proceed but log a warning.
+        """
+        start = time.time()
+        remaining = set(range(self.num_processes))
+
+        # remove self from remaining set
+        if self.process_id in remaining:
+            remaining.remove(self.process_id)
+
+        self.logger.info(f"Waiting for {len(remaining)} peers to be up (timeout={timeout}s)...")
+
+        while remaining and (time.time() - start) < timeout:
+            for pid in remaining.copy():
+                peer = self.config['processes'][pid]
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(0.5)
+                    sock.connect((peer['host'], peer['port']))
+                    sock.close()
+                    remaining.remove(pid)
+                    self.logger.info("Peer P{} is up ({}:{})".format(pid, peer['host'], peer['port']))
+                except Exception:
+                    # still not up
+                    pass
+
+            if remaining:
+                time.sleep(check_interval)
+
+        if remaining:
+            self.logger.warning("Timeout reached while waiting for peers: %s. Proceeding anyway.", sorted(remaining))
+            return False
+        else:
+            self.logger.info("All peers are up. Proceeding to send messages.")
+            return True
     
     def handle_client(self, client_socket: socket.socket):
         """Handle incoming client connection"""
@@ -339,10 +378,8 @@ class SESProcess:
         if receiver_id == self.process_id:
             return
         
-        # Increment vector clock
-        self.vector_clock.increment()
-        
-        # Create message
+        # Create message with current timestamp (capture state before sending)
+        # Do NOT increment VC here - increment happens only on delivery
         msg = Message(
             sender_id=self.process_id,
             receiver_id=receiver_id,
@@ -408,16 +445,16 @@ class SESProcess:
         print(f"Process {self.process_id} - Statistics")
         print(f"{'='*60}")
         print(f"Vector Clock: {self.vector_clock}")
-        print(f"\nMessages Sent:")
+        print("\nMessages Sent:")
         for pid, count in sorted(self.messages_sent.items()):
             print(f"  To P{pid}: {count}")
-        print(f"\nMessages Received:")
+        print("\nMessages Received:")
         for pid, count in sorted(self.messages_received.items()):
             print(f"  From P{pid}: {count}")
-        print(f"\nMessages Delivered:")
+        print("\nMessages Delivered:")
         for pid, count in sorted(self.messages_delivered.items()):
             print(f"  From P{pid}: {count}")
-        print(f"\nBuffering Statistics:")
+        print("\nBuffering Statistics:")
         print(f"  Current buffer size: {len(self.buffer)}")
         print(f"  Total buffered: {self.total_buffered}")
         print(f"  Max buffer size: {self.max_buffer_size}")
@@ -438,9 +475,15 @@ class SESProcess:
         server_thread.daemon = True
         server_thread.start()
         
-        # Wait for all processes to start
-        time.sleep(2)
-        
+        # Wait until all peers' servers appear to be up before sending
+        all_found = self.wait_for_all_peers(timeout=self.config.get('peer_startup_timeout', 60.0))
+
+        # If we successfully detected all peers, wait an extra 5 seconds before sending
+        # (gives a short stabilization window). If we timed out, proceed immediately.
+        if all_found:
+            self.logger.info("All peers confirmed up — sleeping 5s before starting sends to stabilize.")
+            time.sleep(5)
+
         print(f"\n[P{self.process_id}] Starting to send {num_messages} messages to each process...")
         
         # Start sending messages
