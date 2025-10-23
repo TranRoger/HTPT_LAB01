@@ -46,6 +46,9 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Logs - keep directory but ignore log files
+logs/*.log
+
 # docs - LaTeX auxiliary files
 docs/*.aux
 docs/*.log
@@ -55,7 +58,5 @@ docs/*.fls
 docs/*.synctex.gz
 docs/_minted
 docs/.latex*
-docs/*.tex
-docs/*.png
 docs/*.nlo
 docs/*latexmk

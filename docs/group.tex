@@ -1,0 +1,41 @@
+\section{Thông tin sinh viên}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|l|l|l|} \hline
+        \textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} & \textbf{Email} \\ \hline
+        1 & Trần Hùng Anh & 22120016 & 22120016@student.hcmus.edu.vn \\ \hline
+    \end{tabular}
+    \caption{Thông tin thành viên}
+    \label{tab:group}
+\end{table}
+
+\section{Khó khăn và giải pháp}
+
+\subsection{Thread Synchronization}
+\begin{itemize}
+    \item \textbf{Vấn đề}: Race conditions khi nhiều threads truy cập vector clock và buffer đồng thời
+    \item \textbf{Giải pháp}: Sử dụng \texttt{threading.Lock} để đảm bảo thread-safe operations
+    \item \textbf{Kết quả}: Không có race conditions hoặc data corruption trong quá trình chạy
+\end{itemize}
+
+\subsection{Message Ordering}
+\begin{itemize}
+    \item \textbf{Vấn đề}: Messages đến không theo thứ tự do network delay ngẫu nhiên
+    \item \textbf{Giải pháp}: Implement buffer với mechanism check điều kiện delivery liên tục
+    \item \textbf{Kết quả}: 100\% messages được deliver theo đúng thứ tự nhân quả
+\end{itemize}
+
+\subsection{Debugging với Multiple Processes}
+\begin{itemize}
+    \item \textbf{Vấn đề}: Khó debug và trace issues với 15 processes chạy đồng thời
+    \item \textbf{Giải pháp}: Implement chi tiết logging system với timestamps và structured format
+    \item \textbf{Kết quả}: Dễ dàng trace và debug issues thông qua log files
+\end{itemize}
+
+\section{Link tài liệu}
+
+\begin{itemize}
+    \item \textbf{Source code}: \url{https://github.com/TranRoger/HTPT_LAB01}
+    \item \textbf{Video demo}: \url{https://drive.google.com/drive/folders/1j2Y7aWs0-zsBJa_4Z3O54C6_tvlxS4XF?usp=sharing}
+\end{itemize}

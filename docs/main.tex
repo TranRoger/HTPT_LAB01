@@ -1,0 +1,261 @@
+\documentclass[a4paper]{article}
+\usepackage{pdflscape}
+\usepackage{changepage}
+\usepackage{vntex}
+\usepackage[T5]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[main=vietnamese,english]{babel}
+\usepackage{nomencl,etoolbox,ragged2e,siunitx}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{lscape}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{amsmath}
+%\usepackage{algorithm}  % Commented out - conflicts with algorithm2e
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usepackage{enumerate}
+\usepackage{subfigure}
+\usetikzlibrary{positioning, arrows.meta, fit, shapes.geometric}
+\newcommand{\DimensUnits}[2]{\hfill\makebox[8em]{#1\hfill}%
+\makebox[4em]{#2\hfill}\ignorespaces}
+\newcommand{\insertnomheaders}{\item[\bfseries Hàm]%
+\textbf{Chức năng}}
+\renewcommand\nomgroup[1]{%
+  \item[\Large\bfseries
+  \ifstrequal{#1}{B}{\uline{base}}{%
+  \ifstrequal{#1}{D}{\uline{dplyr}}{%
+  \ifstrequal{#1}{G}{\uline{ggplot2}}{%
+  \ifstrequal{#1}{M}{\uline{moments}}{%
+  \ifstrequal{#1}{s}{\uline{Stats}}{%
+  \ifstrequal{#1}{S}{\uline{stringl}}{%
+  \ifstrequal{#1}{U}{\uline{utils}}{%
+  \ifstrequal{#1}{R}{\uline{readxl}}{%
+  \ifstrequal{#1}{V}{\uline{VennDiagram}}{%
+  \ifstrequal{#1}{T}{\uline{tidyverse}}{}}}}}}}}}}]
+  \insertnomheaders
+  }
+  
+\renewcommand*{\nompreamble}{\markboth{\nomname}{\nomname}}
+\renewcommand{\nomname}{Danh sách các hàm R dùng trong bài}
+\newcommand{\nomdescr}[1]{\parbox[t]{4cm}{\RaggedRight #1}}
+\newcommand{\nomwithdim}[5]{\nomenclature[#1]{#2}%
+{\nomdescr{#3}\DimensUnits{#4}{#5}}}
+
+\makenomenclature
+%\usepackage[utf8]{inputenc}
+%\usepackage[francais]{babel}
+\usepackage{a4wide,amssymb,epsfig,latexsym,array,float,hhline,fancyhdr}
+\usepackage[normalem]{ulem}
+%\usepackage{soul}
+
+\usepackage[makeroom]{cancel}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol,longtable,amscd}
+\usepackage{diagbox}%Make diagonal lines in tables
+\usepackage{booktabs}
+\usepackage{alltt}
+\usepackage[framemethod=tikz]{mdframed}% For highlighting paragraph backgrounds
+\usepackage{caption,subcaption}
+
+\usepackage{lastpage}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{graphicx}							% Standard graphics package
+\usepackage{array}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{rotating}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{spverbatim}
+\usepackage{epsfig}
+\usepackage{tikz}
+\usetikzlibrary{arrows,snakes,backgrounds}
+\usepackage[unicode]{hyperref}
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
+%\usepackage{pstcol} 								% PSTricks with the standard color package
+
+\usepackage[normalem]{ulem}
+
+
+\def\thesislayout{	% A4: 210 × 297
+	\geometry{
+		a4paper,
+		total={160mm,240mm},  % fix over page
+		left=30mm,
+		top=30mm,
+	}
+}
+\thesislayout
+
+
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[L]{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[width=8mm,height=8mm]{logo-khtn.png}}
+    %\put(0,-8){\epsfig{width=10mm,figure=hcmut.eps}}
+   \end{picture}&
+	%\includegraphics[width=8mm, height=8mm]{hcmut.png} & %
+	\begin{tabular}{l}
+		\textbf{\bf \ttfamily Ho Chi Minh University of Science}\\
+		\textbf{\bf \ttfamily Faculty of Information Technology}
+	\end{tabular} 	
+ \end{tabular}
+}
+\fancyhead[R]{
+	\begin{tabular}{l}
+		\tiny \bf \\
+		\tiny \bf 
+	\end{tabular}  }
+\fancyfoot{} % clear all footer fields
+\fancyfoot[L]{\scriptsize \ttfamily CHUYÊN ĐỀ HỆ THỐNG PHÂN TÁN}
+\fancyfoot[R]{\scriptsize \ttfamily Page {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\makeatletter
+\newcounter {subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection .\@alph\c@subsubsubsection}
+\newcommand\subsubsubsection{\@startsection{subsubsubsection}{4}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
+\newcommand*{\subsubsubsectionmark}[1]{}
+\makeatother
+
+\everymath{\color{black}}%make in-line maths symbols blue to read/check easily
+\sloppy
+\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=10pt}
+%space remove between caption, figure, and text
+\captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
+\thesislayout
+\usepackage{xcolor}
+\usepackage{minted}
+\usepackage{color}
+
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+% Minted configuration
+\setminted{
+    bgcolor=backgroundColour,
+    fontsize=\footnotesize,
+    linenos=true,
+    breaklines=true,
+    breakanywhere=false,
+    tabsize=2,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm
+}
+
+% Define custom styles for minted
+\setminted[bash]{
+    bgcolor=backgroundColour,
+    style=colorful
+}
+
+\setminted[c]{
+    bgcolor=backgroundColour,
+    style=colorful
+}
+
+\setminted[python]{
+    bgcolor=backgroundColour,
+    style=colorful
+}
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY \\
+HO CHI MINH UNIVERSITY OF SCIENCE \\
+FACULTY OF INFORMATION TECHNOLOGY 
+\end{center}
+
+\vspace{1cm}
+
+\begin{figure}[h!]
+\begin{tikzpicture}[remember picture,overlay,inner sep=0,outer sep=0]
+     \draw[blue!50!black,line width=4pt] ([xshift=-1.5cm,yshift=-2cm]current page.north east) coordinate (A)--([xshift=1.5cm,yshift=-2cm]current page.north west) coordinate(B)--([xshift=1.5cm,yshift=2cm]current page.south west) coordinate (C)--([xshift=-1.5cm,yshift=2cm]current page.south east) coordinate(D)--cycle;
+
+     \draw[blue,line width=1pt] ([yshift=0.25cm,xshift=-0.5cm]A)-- ([yshift=0.25cm,xshift=0.5cm]B)--
+     ([yshift=-0.25cm,xshift=0.5cm]B)--([yshift=-0.25cm,xshift=-0.25cm]B)--([yshift=0.25cm,xshift=-0.25cm]B)--([yshift=0.25cm,xshift=0.25cm]B)--([yshift=-0.5cm,xshift=0.25cm]B)--([yshift=-0.5cm,xshift=-0.25cm]B)--([yshift=0.5cm,xshift=-0.25cm]C)--([yshift=0.5cm,xshift=0.25cm]C)--([yshift=-0.25cm,xshift=0.25cm]C)--([yshift=-0.25cm,xshift=-0.25cm]C)--([yshift=0.25cm,xshift=-0.25cm]C)--([yshift=0.25cm,xshift=0.5cm]C)--([yshift=-0.25cm,xshift=0.5cm]C)--([yshift=-0.25cm,xshift=-0.5cm]D)--([yshift=0.25cm,xshift=-0.5cm]D)--([yshift=0.25cm,xshift=0.25cm]D)--([yshift=-0.25cm,xshift=0.25cm]D)--([yshift=-0.25cm,xshift=-0.25cm]D)--([yshift=0.5cm,xshift=-0.25cm]D)--([yshift=0.5cm,xshift=0.25cm]D)--([yshift=-0.5cm,xshift=0.25cm]A)--([yshift=-0.5cm,xshift=-0.25cm]A)--([yshift=0.25cm,xshift=-0.25cm]A)--([yshift=0.25cm,xshift=0.25cm]A)--([yshift=-0.25cm,xshift=0.25cm]A)--([yshift=-0.25cm,xshift=-0.5cm]A)--([yshift=0.25cm,xshift=-0.5cm]A);
+   \end{tikzpicture}
+\begin{center}
+\includegraphics[width=5cm]{logo-khtn.png}
+\end{center}
+\end{figure}
+
+\vspace{1cm}
+
+
+\begin{center}
+\begin{tabular}{c}
+{\textbf{{\Large CHUYÊN ĐỀ HỆ THỐNG PHÂN TÁN (22\_4)}}}\\
+~~\\
+\hline
+\\
+\textbf{\Large LAB01:}
+
+\textbf{\Large  }\\\\
+\textbf{\Large \textit{\textbf{SES}}}
+\\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{2cm}
+
+\begin{table}[h]
+\begin{tabular}{rrl}
+\hspace{3.25 cm}
+
+& \textbf{Advisor(s)}: &
+
+Huỳnh Thụy Bảo Trân \\ & & Dũng Trần Trung
+\\
+
+& \textbf{Student(s)}: & Trần Hùng Anh
+
+\newline
+\end{tabular}
+\end{table}
+
+\vspace{2cm}
+\begin{center}
+{\footnotesize Ho Chi Minh City, 10/2025}
+\end{center}
+\end{titlepage}
+\newpage
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+\part{Giới thiệu nhóm và tiến độ công việc}
+\input{group} 
+\newpage
+\part{Báo cáo bài tập}
+\input{report}
+\newpage
+\part{Tài liệu tham khảo}
+\input{reference}
+\end{document}
