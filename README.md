@@ -365,10 +365,10 @@ make check-ports
 
 ## 👨‍💻 THÔNG TIN SINH VIÊN
 
-- **Họ tên:** [Điền tên của bạn]
-- **MSSV:** [Điền MSSV]
-- **Lớp:** [Điền lớp]
-- **Email:** [Điền email]
+- **Họ tên:** Trần Hùng Anh
+- **MSSV:** 22120016
+- **Lớp:** 22_4
+- **Email:** anhth5659@gmail.com
 
 ---
 

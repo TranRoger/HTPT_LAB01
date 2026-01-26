@@ -605,9 +605,9 @@ class SESProcess:
         # Đợi server khởi động
         time.sleep(1)
         
-        # Đợi tất cả processes khởi động
+        # Đợi tất cả processes khởi động (cần đủ thời gian cho 15 processes)
         print(f"\n[P{self.process_id}] Waiting for all processes to start...")
-        time.sleep(3)
+        time.sleep(10)  # Tăng từ 3 lên 10 giây cho 15 processes
         
         self._print_colored(f"Starting to send {num_messages} messages to each of {self.num_processes - 1} processes", "cyan")
         
